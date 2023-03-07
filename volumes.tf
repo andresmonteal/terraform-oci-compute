@@ -23,13 +23,16 @@ resource "oci_core_volume" "volume" {
   count               = var.instance_count * length(var.block_storage_sizes_in_gbs)
   availability_domain = oci_core_instance.instance[count.index % var.instance_count].availability_domain
   compartment_id      = var.compartment_ocid
-  display_name        = "${oci_core_instance.instance[count.index % var.instance_count].display_name}_volume${floor(count.index / var.instance_count)}"
+  display_name        = "${oci_core_instance.instance[count.index % var.instance_count].display_name}_BV${floor(count.index / var.instance_count)}"
+
+  # change, adds option to set vpu
+  vpus_per_gb = coalesce(var.vpus_per_gb, 10)
   size_in_gbs = element(
     var.block_storage_sizes_in_gbs,
     floor(count.index / var.instance_count),
   )
   freeform_tags = local.merged_freeform_tags
-  defined_tags  = local.defined_tags #var.defined_tags
+  defined_tags  = var.defined_tags
 }
 
 ####################
@@ -41,4 +44,16 @@ resource "oci_core_volume_attachment" "volume_attachment" {
   instance_id     = oci_core_instance.instance[count.index % var.instance_count].id
   volume_id       = oci_core_volume.volume[count.index].id
   use_chap        = var.use_chap
+}
+
+#############
+# Block Volume backup policy
+#############
+
+# Assign a backup policy to instance's boot volume
+
+resource "oci_core_volume_backup_policy_assignment" "block_volume_backup_policy" {
+  count     = length(var.block_storage_sizes_in_gbs)
+  asset_id  = oci_core_volume.volume[count.index].id
+  policy_id = local.backup_policies[var.boot_volume_backup_policy]
 }

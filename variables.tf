@@ -3,6 +3,11 @@
 
 # general oci parameters
 
+variable "tenancy_ocid" {
+  description = "(Updatable) The OCID of the root compartment"
+  type        = string
+}
+
 variable "compartment_ocid" {
   description = "(Updatable) The OCID of the compartment where to create all resources"
   type        = string
@@ -54,6 +59,18 @@ variable "instance_count" {
   description = "Number of identical instances to launch from a single module."
   type        = number
   default     = 1
+}
+
+variable "private_ip_count" {
+  description = "Number of additional private ips to attach to the primary vnic."
+  type        = number
+  default     = 0
+}
+
+variable "add_vnic_subnet" {
+  description = "Number of additional vnic to attach to the instance."
+  type        = string
+  default     = null
 }
 
 variable "instance_display_name" {
@@ -248,7 +265,7 @@ variable "network_compartment_ocid" {
 variable "attachment_type" {
   description = "(Optional) The type of volume. The only supported values are iscsi and paravirtualized."
   type        = string
-  default     = "iSCSI"
+  default     = "paravirtualized"
 }
 
 variable "block_storage_sizes_in_gbs" {
@@ -270,8 +287,8 @@ variable "boot_volume_backup_policy" {
   default     = "disabled"
 
   validation {
-    condition     = contains(["gold", "silver", "bronze", "disabled"], var.boot_volume_backup_policy)
-    error_message = "Accepted values are gold, silver, bronze or disabled (case sensitive)."
+    condition     = contains(["CLAROCOL-INSTANCES", "gold", "silver", "bronze", "disabled"], var.boot_volume_backup_policy)
+    error_message = "Accepted values are CLAROCOL-INSTANCES (for Claro proyect), gold, silver, bronze or disabled (case sensitive)."
   }
 }
 
@@ -291,4 +308,16 @@ variable "use_chap" {
   description = "(Applicable when attachment_type=iscsi) Whether to use CHAP authentication for the volume attachment."
   type        = bool
   default     = false
+}
+
+variable "vpus_per_gb" {
+  description = "(Optional) (Updatable) The number of volume performance units (VPUs) that will be applied to this volume per GB, representing the Block Volume service's elastic performance options"
+  type        = number
+  default     = 10
+}
+
+variable "vpus_per_gb_boot" {
+  description = "(Optional) (Updatable) The number of volume performance units (VPUs) that will be applied to this volume per GB, representing the Block Volume service's elastic performance options"
+  type        = number
+  default     = 10
 }

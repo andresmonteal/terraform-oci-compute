@@ -4,17 +4,22 @@
 // get virtual cloud network & subnet data
 
 locals {
-  vcn_id            = data.oci_core_subnets.subnets.subnets[0].vcn_id
-  defined_tags      = data.oci_core_subnets.subnets.subnets[0].defined_tags
-  subnet_id         = data.oci_core_subnets.subnets.subnets[0].id
+  vcn_id    = data.oci_core_subnets.subnets.subnets[0].vcn_id
+  subnet_id = data.oci_core_subnets.subnets.subnets[0].id
 }
 
 // Get all the Availability Domains for the region and default backup policies
 data "oci_identity_availability_domains" "ad" {
-  compartment_id = var.compartment_ocid
+  compartment_id = "ocid1.tenancy.oc1..aaaaaaaawttxo6zmedll5b35bsjcvdx5bmobygwx7avyofsxxawvwaps26xq" #var.tenancy_ocid
 }
 
-data "oci_core_volume_backup_policies" "default_backup_policies" {}
+# resource "random_integer" "ad" {
+#   min = 0
+#   max = 2
+# }
+data "oci_core_volume_backup_policies" "default_backup_policies" {
+  compartment_id = "ocid1.compartment.oc1..aaaaaaaay6dnkjuo6pbo23afi7wlxt7niwd3gz3hemymvjsnk6muwx6pecma"
+}
 
 locals {
   ADs = [
@@ -66,7 +71,7 @@ locals {
 resource "oci_core_instance" "instance" {
   count = var.instance_count
   // If no explicit AD number, spread instances on all ADs in round-robin. Looping to the first when last AD is reached
-  availability_domain  = var.ad_number == null ? element(local.ADs, count.index) : element(local.ADs, var.ad_number - 1)
+  availability_domain  = var.ad_number == null ? element(local.ADs, 1) : element(local.ADs, var.ad_number - 1)
   compartment_id       = var.compartment_ocid
   display_name         = var.instance_display_name == "" ? "" : var.instance_count != 1 ? "${var.instance_display_name}_${count.index + 1}" : var.instance_display_name
   extended_metadata    = var.extended_metadata
@@ -82,7 +87,7 @@ resource "oci_core_instance" "instance" {
     baseline_ocpu_utilization = var.baseline_ocpu_utilization
   }
 
-/*   agent_config {
+  /*   agent_config {
     are_all_plugins_disabled = false
     is_management_disabled   = false
     is_monitoring_disabled   = false
@@ -130,7 +135,7 @@ resource "oci_core_instance" "instance" {
 
   create_vnic_details {
     assign_public_ip = var.public_ip == "NONE" ? var.assign_public_ip : false
-    display_name     = var.vnic_name == "" ? "" : var.instance_count != "1" ? "${var.vnic_name}_${count.index + 1}" : var.vnic_name
+    display_name     = var.vnic_name == "" ? var.instance_display_name : var.instance_count != "1" ? "${var.vnic_name}_${count.index + 1}" : var.vnic_name
     hostname_label   = var.hostname_label == "" ? "" : var.instance_count != "1" ? "${var.hostname_label}-${count.index + 1}" : var.hostname_label
     private_ip = element(
       concat(var.private_ips, [""]),
@@ -142,7 +147,7 @@ resource "oci_core_instance" "instance" {
     nsg_ids   = var.primary_vnic_nsg_ids
 
     freeform_tags = local.merged_freeform_tags
-    defined_tags  = local.defined_tags #var.defined_tags
+    defined_tags  = var.defined_tags
   }
 
   metadata = {
@@ -152,12 +157,15 @@ resource "oci_core_instance" "instance" {
 
   source_details {
     boot_volume_size_in_gbs = var.boot_volume_size_in_gbs
+
+    #change, adds vpu per gb
+    boot_volume_vpus_per_gb = var.vpus_per_gb_boot
     source_id               = var.source_ocid
     source_type             = var.source_type
   }
 
   freeform_tags = local.merged_freeform_tags
-  defined_tags  = local.defined_tags #var.defined_tags
+  defined_tags  = var.defined_tags
 
   timeouts {
     create = var.instance_timeout
@@ -205,5 +213,5 @@ resource "oci_core_public_ip" "public_ip" {
   # public_ip_pool_id = oci_core_public_ip_pool.test_public_ip_pool.id # * (BYOIP CIDR Blocks) are not supported yet by this module.
 
   freeform_tags = local.merged_freeform_tags
-  defined_tags  = local.defined_tags #var.defined_tags
+  defined_tags  = var.defined_tags
 }
