@@ -35,7 +35,7 @@ locals {
   default_freeform_tags = {
     # * This list of freeform tags are added by default to user provided freeform tags (var.freeform_tags) if local.merged_freeform_tags is used
     terraformed = "Please do not edit manually"
-    module      = "oracle-terraform-modules/compute-instance/oci"
+    module      = "module:oracle-terraform-oci-compute"
   }
   merged_freeform_tags = merge(local.default_freeform_tags, var.freeform_tags)
 }
