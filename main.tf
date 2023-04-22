@@ -151,7 +151,7 @@ resource "oci_core_instance" "instance" {
   }
 
   metadata = {
-    ssh_authorized_keys = var.ssh_public_keys != null ? var.ssh_public_keys : file(var.ssh_authorized_keys)
+    ssh_authorized_keys = var.ssh_public_keys != null ? trimspace(var.ssh_public_keys) : file(var.ssh_authorized_keys)
     user_data           = var.user_data
   }
 
