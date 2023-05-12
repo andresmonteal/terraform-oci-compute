@@ -1,5 +1,5 @@
 module "instance_flex" {
-  source = "git::ssh://devops.scmservice.us-ashburn-1.oci.oraclecloud.com/namespaces/id9de6bj2yv6/projects/claro-devops/repositories/terraform-oci-compute?ref=v0.2.0"
+  source = "git@github.com:andresmonteal/terraform-oci-iam-compartment.git?ref=v0.2.1"
 
   for_each = var.instances
 
