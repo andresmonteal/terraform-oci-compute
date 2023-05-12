@@ -188,6 +188,15 @@ resource "oci_core_instance" "instance" {
 
   timeouts {
     create = var.instance_timeout
+    update = var.instance_timeout
+    delete = var.instance_timeout
+  }
+
+  lifecycle {
+    ignore_changes = [
+      defined_tags["Oracle-Tags.CreatedBy"],
+      defined_tags["Oracle-Tags.CreatedOn"]
+    ]
   }
 }
 
