@@ -307,7 +307,7 @@ variable "preserve_boot_volume" {
 variable "use_chap" {
   description = "(Applicable when attachment_type=iscsi) Whether to use CHAP authentication for the volume attachment."
   type        = bool
-  default     = false
+  default     = null #false
 }
 
 variable "vpus_per_gb" {
