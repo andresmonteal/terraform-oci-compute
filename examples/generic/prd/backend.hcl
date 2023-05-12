@@ -1,1 +1,0 @@
-key  = "generic-path/environment/app-name/terraform.tfstate"

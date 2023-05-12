@@ -3,6 +3,25 @@
 
 // get virtual cloud network & subnet data
 
+# get compartments ocid
+module "get_compute_cmp" {
+  source       = "git@github.com:andresmonteal/terraform-oci-get-compartment-id.git?ref=v0.1.0"
+  tenancy_ocid = var.tenancy_ocid
+  compartments = var.compute_cmp_list
+}
+
+module "get_volume_bk_policy_cmp" {
+  source       = "git@github.com:andresmonteal/terraform-oci-get-compartment-id.git?ref=v0.1.0"
+  tenancy_ocid = var.tenancy_ocid
+  compartments = var.volume_bk_policy_cmp_list
+}
+
+module "get_network_cmp" {
+  source       = "git@github.com:andresmonteal/terraform-oci-get-compartment-id.git?ref=v0.1.0"
+  tenancy_ocid = var.tenancy_ocid
+  compartments = var.network_cmp_list
+}
+
 locals {
   vcn_id    = data.oci_core_subnets.subnets.subnets[0].vcn_id
   subnet_id = data.oci_core_subnets.subnets.subnets[0].id
@@ -10,7 +29,7 @@ locals {
 
 // Get all the Availability Domains for the region and default backup policies
 data "oci_identity_availability_domains" "ad" {
-  compartment_id = "ocid1.tenancy.oc1..aaaaaaaawttxo6zmedll5b35bsjcvdx5bmobygwx7avyofsxxawvwaps26xq" #var.tenancy_ocid
+  compartment_id = var.tenancy_ocid
 }
 
 # resource "random_integer" "ad" {
@@ -18,7 +37,7 @@ data "oci_identity_availability_domains" "ad" {
 #   max = 2
 # }
 data "oci_core_volume_backup_policies" "default_backup_policies" {
-  compartment_id = "ocid1.compartment.oc1..aaaaaaaay6dnkjuo6pbo23afi7wlxt7niwd3gz3hemymvjsnk6muwx6pecma"
+  compartment_id = module.get_volume_bk_policy_cmp.id
 }
 
 locals {
@@ -49,7 +68,7 @@ locals {
 // Filter on current AD to remove duplicates and give all the shapes supported on the AD.
 // This will not check quota and limits for AD requested at resource creation
 data "oci_core_shapes" "current_ad" {
-  compartment_id      = var.compartment_ocid
+  compartment_id      = module.get_compute_cmp.id
   availability_domain = var.ad_number == null ? element(local.ADs, 0) : element(local.ADs, var.ad_number - 1)
 }
 
@@ -72,7 +91,7 @@ resource "oci_core_instance" "instance" {
   count = var.instance_count
   // If no explicit AD number, spread instances on all ADs in round-robin. Looping to the first when last AD is reached
   availability_domain  = var.ad_number == null ? element(local.ADs, 1) : element(local.ADs, var.ad_number - 1)
-  compartment_id       = var.compartment_ocid
+  compartment_id       = module.get_compute_cmp.id
   display_name         = var.instance_display_name == "" ? "" : var.instance_count != 1 ? "${var.instance_display_name}_${count.index + 1}" : var.instance_display_name
   extended_metadata    = var.extended_metadata
   ipxe_script          = var.ipxe_script
@@ -186,7 +205,7 @@ data "oci_core_instance_credentials" "credential" {
 
 data "oci_core_vnic_attachments" "vnic_attachment" {
   count          = var.instance_count
-  compartment_id = var.compartment_ocid
+  compartment_id = module.get_compute_cmp.id
   instance_id    = oci_core_instance.instance[count.index].id
 
   depends_on = [
@@ -205,7 +224,7 @@ data "oci_core_private_ips" "private_ips" {
 
 resource "oci_core_public_ip" "public_ip" {
   count          = var.public_ip == "NONE" ? 0 : var.instance_count
-  compartment_id = var.compartment_ocid
+  compartment_id = module.get_compute_cmp.id
   lifetime       = var.public_ip
 
   display_name  = var.public_ip_display_name != null ? var.public_ip_display_name : oci_core_instance.instance[count.index].display_name

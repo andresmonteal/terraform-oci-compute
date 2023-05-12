@@ -1,11 +1,11 @@
 module "instance_flex" {
-  source = "git::ssh://devops.scmservice.us-ashburn-1.oci.oraclecloud.com/namespaces/id9de6bj2yv6/projects/claro-devops/repositories/terraform-oci-compute?ref=v0.1.5"
+  source = "git::ssh://devops.scmservice.us-ashburn-1.oci.oraclecloud.com/namespaces/id9de6bj2yv6/projects/claro-devops/repositories/terraform-oci-compute?ref=v0.2.0"
 
   for_each = var.instances
 
   # general oci parameters
   tenancy_ocid     = var.tenancy_ocid
-  compartment_ocid = data.oci_identity_compartments.compute_cmp[each.key].compartments[0].id
+  compute_cmp_list = each.value["compute_cmp"]
   freeform_tags    = lookup(each.value, "freeform_tags", null)
   defined_tags     = lookup(each.value, "defined_tags", null)
 
@@ -25,12 +25,12 @@ module "instance_flex" {
   ssh_public_keys = base64decode(data.oci_secrets_secretbundle.bundle.secret_bundle_content.0.content)
 
   # networking parameters
-  public_ip                = lookup(each.value, "public_ip", "NONE") # NONE, RESERVED or EPHEMERAL
-  subnet_name              = each.value["subnet_name"]
-  network_compartment_ocid = data.oci_identity_compartments.network_cmp.compartments[0].id
-  primary_vnic_nsg_ids     = lookup(each.value, "primary_vnic_nsg_ids", null)
-  private_ip_count         = lookup(each.value, "private_ip_count", 0)
-  add_vnic_subnet          = lookup(each.value, "add_vnic_subnet", null)
+  public_ip            = lookup(each.value, "public_ip", "NONE") # NONE, RESERVED or EPHEMERAL
+  subnet_name          = each.value["subnet_name"]
+  network_cmp_list     = each.value["network_cmp"]
+  primary_vnic_nsg_ids = lookup(each.value, "primary_vnic_nsg_ids", null)
+  private_ip_count     = lookup(each.value, "private_ip_count", 0)
+  add_vnic_subnet      = lookup(each.value, "add_vnic_subnet", null)
 
   # storage parameters
   boot_volume_backup_policy  = lookup(each.value, "boot_volume_backup_policy", "disabled")
@@ -38,4 +38,5 @@ module "instance_flex" {
   block_storage_sizes_in_gbs = lookup(each.value, "block_storage_sizes_in_gbs", [])
   vpus_per_gb                = lookup(each.value, "vpus_per_gb", 10)
   vpus_per_gb_boot           = lookup(each.value, "vpus_per_gb_boot", 10)
+  volume_bk_policy_cmp_list  = lookup(each.value, "vol_policy_cmp", ["BACKUPS"])
 }

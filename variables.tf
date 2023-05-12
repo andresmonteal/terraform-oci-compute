@@ -8,9 +8,9 @@ variable "tenancy_ocid" {
   type        = string
 }
 
-variable "compartment_ocid" {
-  description = "(Updatable) The OCID of the compartment where to create all resources"
-  type        = string
+variable "compute_cmp_list" {
+  description = "Hierarchy compartment list for compute resource"
+  type        = list(string)
 }
 
 variable "instance_timeout" {
@@ -254,10 +254,9 @@ variable "subnet_name" {
   type        = string
 }
 
-variable "network_compartment_ocid" {
-  description = "compartment ocid where vcn and subnet are located"
-  type        = string
-  # no default value, asking user to explicitly set this variable's value. see codingconventions.adoc
+variable "network_cmp_list" {
+  description = "Hierarchy compartment list for compute resource"
+  type        = list(string)
 }
 
 # storage parameters
@@ -281,15 +280,16 @@ variable "block_storage_sizes_in_gbs" {
 #   default     = true
 # }
 
+variable "volume_bk_policy_cmp_list" {
+  description = "Hierarchy compartment list for volume backup policy resource"
+  type        = list(string)
+  default     = null
+}
+
 variable "boot_volume_backup_policy" {
   description = "Choose between default backup policies : gold, silver, bronze. Use disabled to affect no backup policy on the Boot Volume."
   type        = string
   default     = "disabled"
-
-  validation {
-    condition     = contains(["CLAROCOL-INSTANCES", "gold", "silver", "bronze", "disabled"], var.boot_volume_backup_policy)
-    error_message = "Accepted values are CLAROCOL-INSTANCES (for Claro proyect), gold, silver, bronze or disabled (case sensitive)."
-  }
 }
 
 variable "boot_volume_size_in_gbs" {

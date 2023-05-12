@@ -3,15 +3,10 @@
 
 variable "tenancy_ocid" {
   description = "root compartment"
-  default     = "tenancy-id"
+  default     = "ocid1.tenancy.oc1..aaaaaaaawttxo6zmedll5b35bsjcvdx5bmobygwx7avyofsxxawvwaps26xq"
 }
 
 # general oci parameters
-
-variable "network_cmp" {
-  description = "compartment ocid where vcn and subnet are located"
-  type        = string
-}
 
 variable "security_cmp" {
   description = "compartment ocid where secrets are located"
