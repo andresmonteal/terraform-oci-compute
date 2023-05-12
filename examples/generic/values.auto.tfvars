@@ -1,4 +1,3 @@
-secret_name  = "SECRET"
 security_cmp = "SECURITY"
 
 # Below is a proposed generic notation to be used for naming Compartments:
@@ -7,6 +6,7 @@ security_cmp = "SECURITY"
 instances = {
   "cmp-ans-prd-sales-yum" = {
     shape                       = "VM.Standard3.Flex"
+    secret_name                 = "lz-secret-ssh-key-pri"
     compute_cmp                 = ["LVL1", "LVL2", "LVL3"]
     network_cmp                 = ["LVL1"]
     ad_number                   = 1
@@ -22,6 +22,7 @@ instances = {
   },
   "cmp-ans-prd-sales-has" = {
     shape                       = "VM.Standard3.Flex"
+    secret_name                 = "lz-secret-ssh-key-pri"
     compute_cmp                 = ["LVL1"]
     network_cmp                 = ["LVL1", "LVL2", "LVL3"]
     ad_number                   = 1
