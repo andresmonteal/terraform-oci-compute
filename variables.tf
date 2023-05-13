@@ -11,6 +11,13 @@ variable "tenancy_ocid" {
 variable "compute_cmp_list" {
   description = "Hierarchy compartment list for compute resource"
   type        = list(string)
+  default     = null
+}
+
+variable "compute_cmp_id" {
+  description = "Compartment id for compute resource"
+  type        = string
+  default     = null
 }
 
 variable "instance_timeout" {
@@ -255,8 +262,15 @@ variable "subnet_name" {
 }
 
 variable "network_cmp_list" {
-  description = "Hierarchy compartment list for compute resource"
+  description = "Hierarchy compartment list for networking resources"
   type        = list(string)
+  default     = null
+}
+
+variable "network_cmp_id" {
+  description = "Compartment id for networking resources"
+  type        = string
+  default     = null
 }
 
 # storage parameters
@@ -282,6 +296,12 @@ variable "block_storage_sizes_in_gbs" {
 
 variable "volume_bk_policy_cmp_list" {
   description = "Hierarchy compartment list for volume backup policy resource"
+  type        = list(string)
+  default     = null
+}
+
+variable "volume_bk_policy_cmp_id" {
+  description = "Compartment id for volume backup policy resource"
   type        = list(string)
   default     = null
 }

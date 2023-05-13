@@ -1,5 +1,5 @@
 module "instance_flex" {
-  source = "git@github.com:andresmonteal/terraform-oci-iam-compartment.git?ref=v0.3.1"
+  source = "git@github.com:andresmonteal/terraform-oci-iam-compartment.git?ref=v0.4.0"
 
   for_each = var.instances
 
