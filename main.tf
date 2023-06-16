@@ -1,95 +1,6 @@
 # Copyright (c) 2018, 2022 Oracle Corporation and/or affiliates.  All rights reserved.
 # Licensed under the Universal Permissive License v 1.0 as shown at https://oss.oracle.com/licenses/upl
 
-// get virtual cloud network & subnet data
-
-# get compartments ocid
-module "get_compute_cmp" {
-  source       = "git@github.com:andresmonteal/terraform-oci-get-compartment-id.git?ref=v0.1.0"
-  tenancy_ocid = var.tenancy_ocid
-  compartments = var.compute_cmp_list
-
-  count = var.compute_cmp_id == null ? 1 : 0
-}
-
-module "get_volume_bk_policy_cmp" {
-  source       = "git@github.com:andresmonteal/terraform-oci-get-compartment-id.git?ref=v0.1.0"
-  tenancy_ocid = var.tenancy_ocid
-  compartments = var.volume_bk_policy_cmp_list
-
-  count = var.volume_bk_policy_cmp_id == null ? 1 : 0
-}
-
-module "get_network_cmp" {
-  source       = "git@github.com:andresmonteal/terraform-oci-get-compartment-id.git?ref=v0.1.0"
-  tenancy_ocid = var.tenancy_ocid
-  compartments = var.network_cmp_list
-
-  count = var.network_cmp_id == null ? 1 : 0
-}
-
-locals {
-  vcn_id    = data.oci_core_subnets.subnets.subnets[0].vcn_id
-  subnet_id = data.oci_core_subnets.subnets.subnets[0].id
-}
-
-// Get all the Availability Domains for the region and default backup policies
-data "oci_identity_availability_domains" "ad" {
-  compartment_id = var.tenancy_ocid
-}
-
-# resource "random_integer" "ad" {
-#   min = 0
-#   max = 2
-# }
-data "oci_core_volume_backup_policies" "default_backup_policies" {
-  compartment_id = try(module.get_volume_bk_policy_cmp[0].id, var.volume_bk_policy_cmp_id)
-}
-
-locals {
-  ADs = [
-    // Iterate through data.oci_identity_availability_domains.ad and create a list containing AD names
-    for i in data.oci_identity_availability_domains.ad.availability_domains : i.name
-  ]
-  backup_policies = {
-    // Iterate through data.oci_core_volume_backup_policies.default_backup_policies and create a map containing name & ocid
-    // This is used to specify a backup policy id by name
-    for i in data.oci_core_volume_backup_policies.default_backup_policies.volume_backup_policies : i.display_name => i.id
-  }
-}
-
-####################
-# Subnet Datasource
-####################
-/* data "oci_core_subnet" "instance_subnet" {
-  count     = length(var.subnet_ocids)
-  subnet_id = element(var.subnet_ocids, count.index)
-} */
-
-############
-# Shapes
-############
-
-// Create a data source for compute shapes.
-// Filter on current AD to remove duplicates and give all the shapes supported on the AD.
-// This will not check quota and limits for AD requested at resource creation
-data "oci_core_shapes" "current_ad" {
-  compartment_id      = try(module.get_compute_cmp[0].id, var.compute_cmp_id)
-  availability_domain = var.ad_number == null ? element(local.ADs, 0) : element(local.ADs, var.ad_number - 1)
-}
-
-locals {
-  shapes_config = {
-    // prepare data with default values for flex shapes. Used to populate shape_config block with default values
-    // Iterate through data.oci_core_shapes.current_ad.shapes (this exclude duplicate data in multi-ad regions) and create a map { name = { memory_in_gbs = "xx"; ocpus = "xx" } }
-    for i in data.oci_core_shapes.current_ad.shapes : i.name => {
-      "memory_in_gbs" = i.memory_in_gbs
-      "ocpus"         = i.ocpus
-    }
-  }
-  shape_is_flex = length(regexall("^*.Flex", var.shape)) > 0 # evaluates to boolean true when var.shape contains .Flex
-}
-
 ############
 # Instance
 ############
@@ -97,7 +8,7 @@ resource "oci_core_instance" "instance" {
   count = var.instance_count
   // If no explicit AD number, spread instances on all ADs in round-robin. Looping to the first when last AD is reached
   availability_domain  = var.ad_number == null ? element(local.ADs, 1) : element(local.ADs, var.ad_number - 1)
-  compartment_id       = try(module.get_compute_cmp[0].id, var.compute_cmp_id)
+  compartment_id       = local.compute_cmp_id
   display_name         = var.instance_display_name == "" ? "" : var.instance_count != 1 ? "${var.instance_display_name}_${count.index + 1}" : var.instance_display_name
   extended_metadata    = var.extended_metadata
   ipxe_script          = var.ipxe_script
@@ -176,7 +87,7 @@ resource "oci_core_instance" "instance" {
   }
 
   metadata = {
-    ssh_authorized_keys = try(trimspace(var.ssh_public_keys), file(var.ssh_authorized_keys), null)
+    ssh_authorized_keys = try(trimspace(base64decode(data.oci_secrets_secretbundle.bundle[0].secret_bundle_content.0.content)), trimspace(var.ssh_public_keys), file(var.ssh_authorized_keys), null)
     user_data           = var.user_data
   }
 
@@ -206,40 +117,13 @@ resource "oci_core_instance" "instance" {
   }
 }
 
-##################################
-# Instance Credentials Datasource
-##################################
-data "oci_core_instance_credentials" "credential" {
-  count       = var.resource_platform != "linux" ? var.instance_count : 0
-  instance_id = oci_core_instance.instance[count.index].id
-}
-
 ####################
 # Networking
 ####################
 
-data "oci_core_vnic_attachments" "vnic_attachment" {
-  count          = var.instance_count
-  compartment_id = try(module.get_compute_cmp[0].id, var.compute_cmp_id)
-  instance_id    = oci_core_instance.instance[count.index].id
-
-  depends_on = [
-    oci_core_instance.instance
-  ]
-}
-
-data "oci_core_private_ips" "private_ips" {
-  count   = var.instance_count
-  vnic_id = data.oci_core_vnic_attachments.vnic_attachment[count.index].vnic_attachments[0].vnic_id
-
-  depends_on = [
-    oci_core_instance.instance
-  ]
-}
-
 resource "oci_core_public_ip" "public_ip" {
   count          = var.public_ip == "NONE" ? 0 : var.instance_count
-  compartment_id = try(module.get_compute_cmp[0].id, var.compute_cmp_id)
+  compartment_id = local.compute_cmp_id
   lifetime       = var.public_ip
 
   display_name  = var.public_ip_display_name != null ? var.public_ip_display_name : oci_core_instance.instance[count.index].display_name

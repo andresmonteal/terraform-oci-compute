@@ -8,14 +8,59 @@ variable "tenancy_ocid" {
   type        = string
 }
 
-variable "compute_cmp_list" {
-  description = "Hierarchy compartment list for compute resource"
-  type        = list(string)
+# compartments
+variable "compute_cmp" {
+  description = "Compartment name for compute resource"
+  type        = string
   default     = null
 }
 
 variable "compute_cmp_id" {
   description = "Compartment id for compute resource"
+  type        = string
+  default     = null
+}
+
+variable "network_cmp" {
+  description = "Compartment name for networking resources"
+  type        = string
+  default     = null
+}
+
+variable "network_cmp_id" {
+  description = "Compartment id for networking resources"
+  type        = string
+  default     = null
+}
+
+variable "volume_bk_policy_cmp" {
+  description = "Compartment name for volume backup policy resource"
+  type        = string
+  default     = null
+}
+
+variable "volume_bk_policy_cmp_id" {
+  description = "Compartment id for volume backup policy resource"
+  type        = string
+  default     = null
+}
+
+variable "security_cmp" {
+  description = "Compartment name for security resources"
+  type        = string
+  default     = null
+}
+
+variable "security_cmp_id" {
+  description = "Compartment id for security resources"
+  type        = string
+  default     = null
+}
+
+# optionals
+
+variable "secret" {
+  description = "Secret name to be used as key for the compute resource"
   type        = string
   default     = null
 }
@@ -36,15 +81,6 @@ variable "defined_tags" {
   description = "predefined and scoped to a namespace to tag the resources created using defined tags."
   type        = map(string)
   default     = null
-}
-
-locals {
-  default_freeform_tags = {
-    # * This list of freeform tags are added by default to user provided freeform tags (var.freeform_tags) if local.merged_freeform_tags is used
-    terraformed = "Please do not edit manually"
-    module      = "oracle-terraform-oci-compute"
-  }
-  merged_freeform_tags = merge(local.default_freeform_tags, var.freeform_tags)
 }
 
 # compute instance parameters
@@ -261,18 +297,6 @@ variable "subnet_name" {
   type        = string
 }
 
-variable "network_cmp_list" {
-  description = "Hierarchy compartment list for networking resources"
-  type        = list(string)
-  default     = null
-}
-
-variable "network_cmp_id" {
-  description = "Compartment id for networking resources"
-  type        = string
-  default     = null
-}
-
 # storage parameters
 
 variable "attachment_type" {
@@ -293,18 +317,6 @@ variable "block_storage_sizes_in_gbs" {
 #   type        = bool
 #   default     = true
 # }
-
-variable "volume_bk_policy_cmp_list" {
-  description = "Hierarchy compartment list for volume backup policy resource"
-  type        = list(string)
-  default     = null
-}
-
-variable "volume_bk_policy_cmp_id" {
-  description = "Compartment id for volume backup policy resource"
-  type        = list(string)
-  default     = null
-}
 
 variable "boot_volume_backup_policy" {
   description = "Choose between default backup policies : gold, silver, bronze. Use disabled to affect no backup policy on the Boot Volume."

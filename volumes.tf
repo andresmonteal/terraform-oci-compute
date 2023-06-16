@@ -22,7 +22,7 @@ resource "oci_core_volume_backup_policy_assignment" "boot_volume_backup_policy" 
 resource "oci_core_volume" "volume" {
   count               = var.instance_count * length(var.block_storage_sizes_in_gbs)
   availability_domain = oci_core_instance.instance[count.index % var.instance_count].availability_domain
-  compartment_id      = try(module.get_compute_cmp[0].id, var.compute_cmp_id)
+  compartment_id      = local.compute_cmp_id
   display_name        = "${oci_core_instance.instance[count.index % var.instance_count].display_name}_BV${floor(count.index / var.instance_count)}"
 
   # change, adds option to set vpu

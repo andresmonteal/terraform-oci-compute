@@ -20,7 +20,7 @@ resource "oci_core_vnic_attachment" "additional_vnic" {
     assign_public_ip = false
     defined_tags     = var.defined_tags
     freeform_tags    = local.merged_freeform_tags
-    subnet_id        = data.oci_core_subnets.add_subnet.subnets[0].id
+    subnet_id        = data.oci_core_subnets.add_subnet[0].subnets[0].id
     display_name     = "${oci_core_instance.instance[0].display_name}_0"
   }
   instance_id = oci_core_instance.instance[0].id

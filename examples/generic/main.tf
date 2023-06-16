@@ -1,13 +1,13 @@
 module "instance_flex" {
-  source = "git@github.com:andresmonteal/terraform-oci-iam-compartment.git?ref=v0.4.0"
+  source = "../../"
 
   for_each = var.instances
 
   # general oci parameters
-  tenancy_ocid     = var.tenancy_ocid
-  compute_cmp_list = each.value["compute_cmp"]
-  freeform_tags    = lookup(each.value, "freeform_tags", null)
-  defined_tags     = lookup(each.value, "defined_tags", null)
+  tenancy_ocid  = var.tenancy_ocid
+  compute_cmp   = each.value["compute_cmp"]
+  freeform_tags = lookup(each.value, "freeform_tags", null)
+  defined_tags  = lookup(each.value, "defined_tags", null)
 
   # compute instance parameters
   ad_number                   = lookup(each.value, "ad_number", null)
@@ -22,12 +22,12 @@ module "instance_flex" {
   baseline_ocpu_utilization   = lookup(each.value, "baseline_ocpu_utilization", "BASELINE_1_1")
 
   # operating system parameters
-  ssh_public_keys = base64decode(data.oci_secrets_secretbundle.bundle.secret_bundle_content.0.content)
+  secret = lookup(each.value, "secret", null)
 
   # networking parameters
   public_ip            = lookup(each.value, "public_ip", "NONE") # NONE, RESERVED or EPHEMERAL
   subnet_name          = each.value["subnet_name"]
-  network_cmp_list     = each.value["network_cmp"]
+  network_cmp          = each.value["network_cmp"]
   primary_vnic_nsg_ids = lookup(each.value, "primary_vnic_nsg_ids", null)
   private_ip_count     = lookup(each.value, "private_ip_count", 0)
   add_vnic_subnet      = lookup(each.value, "add_vnic_subnet", null)
@@ -38,5 +38,5 @@ module "instance_flex" {
   block_storage_sizes_in_gbs = lookup(each.value, "block_storage_sizes_in_gbs", [])
   vpus_per_gb                = lookup(each.value, "vpus_per_gb", 10)
   vpus_per_gb_boot           = lookup(each.value, "vpus_per_gb_boot", 10)
-  volume_bk_policy_cmp_list  = lookup(each.value, "vol_policy_cmp", ["BACKUPS"])
+  volume_bk_policy_cmp       = lookup(each.value, "vol_policy_cmp", null)
 }
