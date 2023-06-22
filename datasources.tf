@@ -36,7 +36,7 @@ data "oci_identity_compartments" "network" {
   }
 }
 
-data "oci_identity_compartments" "boot_volume_backup_policy" {
+data "oci_identity_compartments" "volume_backup_policy" {
   count = var.volume_bk_policy_cmp == null ? 0 : 1
   #Required
   compartment_id            = var.tenancy_ocid

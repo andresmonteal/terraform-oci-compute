@@ -6,7 +6,7 @@ locals {
   merged_freeform_tags    = merge(var.freeform_tags, local.default_freeform_tags)
   compute_cmp_id          = try(data.oci_identity_compartments.compute[0].compartments[0].id, var.compute_cmp_id)
   network_cmp_id          = try(data.oci_identity_compartments.network[0].compartments[0].id, var.network_cmp_id)
-  volume_bk_policy_cmp_id = try(data.oci_identity_compartments.compute[0].compartments[0].id, var.volume_bk_policy_cmp_id)
+  volume_bk_policy_cmp_id = try(data.oci_identity_compartments.volume_backup_policy[0].compartments[0].id, var.volume_bk_policy_cmp_id)
   security_cmp_id         = try(data.oci_identity_compartments.security[0].compartments[0].id, var.security_cmp_id)
   ADs = [
     // Iterate through data.oci_identity_availability_domains.ad and create a list containing AD names
