@@ -53,7 +53,7 @@ resource "oci_core_volume_attachment" "volume_attachment" {
 # Assign a backup policy to instance's boot volume
 
 resource "oci_core_volume_backup_policy_assignment" "block_volume_backup_policy" {
-  count     = length(var.block_storage_sizes_in_gbs)
+  count     = var.boot_volume_backup_policy == null ? 0 : length(var.block_storage_sizes_in_gbs)
   asset_id  = oci_core_volume.volume[count.index].id
   policy_id = local.backup_policies[var.boot_volume_backup_policy]
 }
