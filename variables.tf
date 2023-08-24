@@ -217,6 +217,12 @@ variable "ssh_public_keys" {
   default     = null
 }
 
+variable "ssh_public_keys_no_trim" {
+  description = "No trim Public SSH keys (for upgrade reasons) to be included in the ~/.ssh/authorized_keys file for the default user on the instance. To provide multiple keys, see docs/instance_ssh_keys.adoc."
+  type        = string
+  default     = null
+}
+
 variable "user_data" {
   description = "Provide your own base64-encoded data to be used by Cloud-Init to run custom scripts or provide custom Cloud-Init configuration."
   type        = string
