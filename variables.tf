@@ -324,6 +324,12 @@ variable "boot_volume_backup_policy" {
   default     = "disabled"
 }
 
+variable "block_volume_backup_policy" {
+  description = "Choose between default backup policies : gold, silver, bronze. Use disabled to affect no backup policy on the Block Volume."
+  type        = string
+  default     = "disabled"
+}
+
 variable "boot_volume_size_in_gbs" {
   description = "The size of the boot volume in GBs."
   type        = number
