@@ -214,13 +214,13 @@ variable "ssh_authorized_keys" {
 variable "ssh_public_keys" {
   description = "Public SSH keys to be included in the ~/.ssh/authorized_keys file for the default user on the instance. To provide multiple keys, see docs/instance_ssh_keys.adoc."
   type        = string
-  default     = null
+  default     = ""
 }
 
 variable "ssh_public_keys_no_trim" {
   description = "No trim Public SSH keys (for upgrade reasons) to be included in the ~/.ssh/authorized_keys file for the default user on the instance. To provide multiple keys, see docs/instance_ssh_keys.adoc."
   type        = string
-  default     = null
+  default     = ""
 }
 
 variable "user_data" {
