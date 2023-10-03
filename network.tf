@@ -12,16 +12,15 @@ resource "oci_core_private_ip" "private_ip" {
   }
 }
 
-resource "oci_core_vnic_attachment" "additional_vnic" {
-  count = var.add_vnic_subnet == null ? 0 : 1
-  #Required
-  create_vnic_details {
-    #Optional
-    assign_public_ip = false
-    defined_tags     = var.defined_tags
-    freeform_tags    = local.merged_freeform_tags
-    subnet_id        = data.oci_core_subnets.add_subnet[0].subnets[0].id
-    display_name     = "${oci_core_instance.instance[0].display_name}_0"
-  }
-  instance_id = oci_core_instance.instance[0].id
+module "additional_vnic" {
+  source = "./vnics"
+  count  = length(keys(var.add_vnic_subnet))
+
+  network_cmp   = local.network_cmp_id
+  defined_tags  = var.defined_tags
+  freeform_tags = local.merged_freeform_tags
+  subnet        = element(keys(var.add_vnic_subnet), count.index)
+  display_name  = "${oci_core_instance.instance[0].display_name}_${count.index}"
+  private_ips   = element(values(var.add_vnic_subnet), count.index)
+  instance_id   = oci_core_instance.instance[0].id
 }

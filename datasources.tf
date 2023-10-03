@@ -82,15 +82,6 @@ data "oci_core_subnets" "subnets" {
   display_name = var.subnet_name
 }
 
-data "oci_core_subnets" "add_subnet" {
-  count = var.add_vnic_subnet == null ? 0 : 1
-  #Required
-  compartment_id = local.network_cmp_id
-
-  #Optional
-  display_name = var.add_vnic_subnet
-}
-
 data "oci_core_vnic_attachments" "all_vnics" {
   #Required
   compartment_id = local.compute_cmp_id

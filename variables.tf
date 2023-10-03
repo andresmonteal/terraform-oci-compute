@@ -112,7 +112,7 @@ variable "private_ip_count" {
 
 variable "add_vnic_subnet" {
   description = "Number of additional vnic to attach to the instance."
-  type        = string
+  type        = map(any)
   default     = null
 }
 
