@@ -15,6 +15,7 @@ resource "oci_core_instance" "instance" {
   preserve_boot_volume = var.preserve_boot_volume
   state                = var.instance_state
   shape                = var.shape
+  fault_domain         = var.fault_domain
   shape_config {
     // If shape name contains ".Flex" and instance_flex inputs are not null, use instance_flex inputs values for shape_config block
     // Else use values from data.oci_core_shapes.current_ad for var.shape

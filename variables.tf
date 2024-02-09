@@ -365,3 +365,8 @@ variable "vpus_per_gb_boot" {
   type        = number
   default     = 10
 }
+
+variable "fault_domain" {
+  description = "(Optional) (Updatable) A fault domain is a grouping of hardware and infrastructure within an availability domain. Each availability domain contains three fault domains. Fault domains let you distribute your instances so that they are not on the same physical hardware within a single availability domain. A hardware failure or Compute hardware maintenance that affects one fault domain does not affect instances in other fault domains. If you do not specify the fault domain, the system selects one for you."
+  default = null
+}
