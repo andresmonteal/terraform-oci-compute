@@ -88,7 +88,7 @@ resource "oci_core_instance" "instance" {
   }
 
   metadata = {
-    ssh_authorized_keys = join(var.ssh_public_keys_no_trim, trimspace(var.ssh_public_keys), try(trimspace(base64decode(data.oci_secrets_secretbundle.bundle[0].secret_bundle_content.0.content)), null))
+    ssh_authorized_keys = var.ssh_public_keys == null ? null : trimspace(var.ssh_public_keys)
     user_data           = var.user_data
   }
 
