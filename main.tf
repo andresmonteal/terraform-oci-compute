@@ -71,7 +71,7 @@ resource "oci_core_instance" "instance" {
   } */
 
   create_vnic_details {
-    assign_public_ip = var.public_ip == "NONE" ? var.assign_public_ip : false
+    assign_public_ip = var.public_ip == "NONE" ? var.assign_public_ip : var.public_ip == "EPHEMERAL" ? true : false
     display_name     = var.vnic_name == "" ? var.instance_display_name : var.instance_count != "1" ? "${var.vnic_name}_${count.index + 1}" : var.vnic_name
     hostname_label   = var.hostname_label == "" ? "" : var.instance_count != "1" ? "${var.hostname_label}-${count.index + 1}" : var.hostname_label
     private_ip = element(
