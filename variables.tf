@@ -112,8 +112,8 @@ variable "private_ip_count" {
 
 variable "add_vnic_subnet" {
   description = "Number of additional vnic to attach to the instance."
-  type        = map(any)
-  default     = null
+  type        = list(map(any))
+  default     = []
 }
 
 variable "instance_display_name" {
@@ -368,10 +368,10 @@ variable "vpus_per_gb_boot" {
 
 variable "fault_domain" {
   description = "(Optional) (Updatable) A fault domain is a grouping of hardware and infrastructure within an availability domain. Each availability domain contains three fault domains. Fault domains let you distribute your instances so that they are not on the same physical hardware within a single availability domain. A hardware failure or Compute hardware maintenance that affects one fault domain does not affect instances in other fault domains. If you do not specify the fault domain, the system selects one for you."
-  default = null
+  default     = null
 }
 
 variable "vnic_prefix" {
   description = "(Optional) (Updatable) A prefix to be used when creating additional vnics."
-  default = ""
+  default     = ""
 }

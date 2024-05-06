@@ -14,13 +14,13 @@ resource "oci_core_private_ip" "private_ip" {
 
 module "additional_vnic" {
   source = "./vnics"
-  count  = length(keys(var.add_vnic_subnet))
+  count  = length(var.add_vnic_subnet)
 
   network_cmp   = local.network_cmp_id
   defined_tags  = var.defined_tags
   freeform_tags = local.merged_freeform_tags
-  subnet        = element(keys(var.add_vnic_subnet), count.index)
-  display_name  = "${oci_core_instance.instance[0].display_name}-${format("%s%s", var.vnic_prefix, count.index+1)}"
-  private_ips   = element(values(var.add_vnic_subnet), count.index)
+  subnet        = keys(element(var.add_vnic_subnet, count.index))[0]
+  display_name  = "${oci_core_instance.instance[0].display_name}-${format("%s%s", var.vnic_prefix, count.index + 1)}"
+  private_ips   = values(element(var.add_vnic_subnet, count.index))[0]
   instance_id   = oci_core_instance.instance[0].id
 }
