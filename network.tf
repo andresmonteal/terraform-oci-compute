@@ -20,7 +20,7 @@ module "additional_vnic" {
   defined_tags  = var.defined_tags
   freeform_tags = local.merged_freeform_tags
   subnet        = element(keys(var.add_vnic_subnet), count.index)
-  display_name  = "${oci_core_instance.instance[0].display_name}_${count.index}"
+  display_name  = "${oci_core_instance.instance[0].display_name}-${format("%s%s", var.vnic_prefix, count.index+1)}"
   private_ips   = element(values(var.add_vnic_subnet), count.index)
   instance_id   = oci_core_instance.instance[0].id
 }
