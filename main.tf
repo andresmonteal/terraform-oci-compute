@@ -36,43 +36,6 @@ resource "oci_core_instance" "instance" {
         name          = plugins_config.key
       }
     }
-
-    # plugins_config {
-    #   desired_state = lookup(var.cloud_agent_plugins, "autonomous_linux", "disable")
-    #   name          = "Oracle Autonomous Linux"
-    # }
-    # plugins_config {
-    #   desired_state = lookup(var.cloud_agent_plugins, "bastion", "disable")
-    #   name          = "Bastion"
-    # }
-    # plugins_config {
-    #   desired_state = lookup(var.cloud_agent_plugins, "block_volume_mgmt", "disable")
-    #   name          = "Block Volume Management"
-    # }
-    # plugins_config {
-    #   desired_state = lookup(var.cloud_agent_plugins, "custom_logs", "disable")
-    #   name          = "Custom Logs Monitoring"
-    # }
-    # plugins_config {
-    #   desired_state = lookup(var.cloud_agent_plugins, "management", "disable")
-    #   name          = "Management Agent"
-    # }
-    # plugins_config {
-    #   desired_state = lookup(var.cloud_agent_plugins, "monitoring", "disable")
-    #   name          = "Compute Instance Monitoring"
-    # }
-    # plugins_config {
-    #   desired_state = lookup(var.cloud_agent_plugins, "osms", "disable")
-    #   name          = "OS Management Service Agent"
-    # }
-    # plugins_config {
-    #   desired_state = lookup(var.cloud_agent_plugins, "run_command", "disable")
-    #   name          = "Compute Instance Run Command"
-    # }
-    # plugins_config {
-    #   desired_state = lookup(var.cloud_agent_plugins, "vulnerability_scanning", "disable")
-    #   name          = "Vulnerability Scanning"
-    # }
   }
 
   create_vnic_details {
