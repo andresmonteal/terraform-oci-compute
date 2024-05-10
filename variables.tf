@@ -151,22 +151,11 @@ variable "shape" {
   default     = "VM.Standard2.1"
 }
 
-/* variable "cloud_agent_plugins" {
+variable "cloud_agent_plugins" {
   description = "Whether each Oracle Cloud Agent plugins should be ENABLED or DISABLED."
   type        = map(string)
-  default = {
-    autonomous_linux       = "ENABLED"
-    bastion                = "ENABLED"
-    block_volume_mgmt      = "DISABLED"
-    custom_logs            = "ENABLED"
-    management             = "DISABLED"
-    monitoring             = "ENABLED"
-    osms                   = "ENABLED"
-    run_command            = "ENABLED"
-    vulnerability_scanning = "ENABLED"
-  }
-  #* need to craft a validation condition at some point
-} */
+  default     = {}
+}
 
 variable "baseline_ocpu_utilization" {
   description = "(Updatable) The baseline OCPU utilization for a subcore burstable VM instance"

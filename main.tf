@@ -24,51 +24,56 @@ resource "oci_core_instance" "instance" {
     baseline_ocpu_utilization = var.baseline_ocpu_utilization
   }
 
-  /*   agent_config {
+  agent_config {
     are_all_plugins_disabled = false
     is_management_disabled   = false
     is_monitoring_disabled   = false
 
-    # ! provider seems to have a bug with plugin_config stanzas below
-    // this configuration is applied at first resource creation
-    // subsequent updates are detected as changes by terraform but seems to be ignored by the provider ...
-    plugins_config {
-      desired_state = var.cloud_agent_plugins.autonomous_linux
-      name          = "Oracle Autonomous Linux"
+    dynamic "plugins_config" {
+      for_each = var.cloud_agent_plugins
+      content {
+        desired_state = plugins_config.value
+        name          = plugins_config.key
+      }
     }
-    plugins_config {
-      desired_state = var.cloud_agent_plugins.bastion
-      name          = "Bastion"
-    }
-    plugins_config {
-      desired_state = var.cloud_agent_plugins.block_volume_mgmt
-      name          = "Block Volume Management"
-    }
-    plugins_config {
-      desired_state = var.cloud_agent_plugins.custom_logs
-      name          = "Custom Logs Monitoring"
-    }
-    plugins_config {
-      desired_state = var.cloud_agent_plugins.management
-      name          = "Management Agent"
-    }
-    plugins_config {
-      desired_state = var.cloud_agent_plugins.monitoring
-      name          = "Compute Instance Monitoring"
-    }
-    plugins_config {
-      desired_state = var.cloud_agent_plugins.osms
-      name          = "OS Management Service Agent"
-    }
-    plugins_config {
-      desired_state = var.cloud_agent_plugins.run_command
-      name          = "Compute Instance Run Command"
-    }
-    plugins_config {
-      desired_state = var.cloud_agent_plugins.vulnerability_scanning
-      name          = "Vulnerability Scanning"
-    }
-  } */
+
+    # plugins_config {
+    #   desired_state = lookup(var.cloud_agent_plugins, "autonomous_linux", "disable")
+    #   name          = "Oracle Autonomous Linux"
+    # }
+    # plugins_config {
+    #   desired_state = lookup(var.cloud_agent_plugins, "bastion", "disable")
+    #   name          = "Bastion"
+    # }
+    # plugins_config {
+    #   desired_state = lookup(var.cloud_agent_plugins, "block_volume_mgmt", "disable")
+    #   name          = "Block Volume Management"
+    # }
+    # plugins_config {
+    #   desired_state = lookup(var.cloud_agent_plugins, "custom_logs", "disable")
+    #   name          = "Custom Logs Monitoring"
+    # }
+    # plugins_config {
+    #   desired_state = lookup(var.cloud_agent_plugins, "management", "disable")
+    #   name          = "Management Agent"
+    # }
+    # plugins_config {
+    #   desired_state = lookup(var.cloud_agent_plugins, "monitoring", "disable")
+    #   name          = "Compute Instance Monitoring"
+    # }
+    # plugins_config {
+    #   desired_state = lookup(var.cloud_agent_plugins, "osms", "disable")
+    #   name          = "OS Management Service Agent"
+    # }
+    # plugins_config {
+    #   desired_state = lookup(var.cloud_agent_plugins, "run_command", "disable")
+    #   name          = "Compute Instance Run Command"
+    # }
+    # plugins_config {
+    #   desired_state = lookup(var.cloud_agent_plugins, "vulnerability_scanning", "disable")
+    #   name          = "Vulnerability Scanning"
+    # }
+  }
 
   create_vnic_details {
     assign_public_ip = var.public_ip == "NONE" ? var.assign_public_ip : var.public_ip == "EPHEMERAL" ? true : false
