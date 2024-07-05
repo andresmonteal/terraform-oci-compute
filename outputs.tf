@@ -1,5 +1,5 @@
-# Copyright (c) 2018, 2021 Oracle Corporation and/or affiliates.  All rights reserved.
-# Licensed under the Universal Permissive License v 1.0 as shown at https://oss.oracle.com/licenses/upl
+# Copyright (c) 2024 Andres Montealegre, Email: montealegre.af@gmail.com
+# This project is licensed under the MIT License. See the [LICENSE] file for details.
 
 locals {
   instances_details = [

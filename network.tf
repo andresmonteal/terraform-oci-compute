@@ -1,3 +1,6 @@
+# Copyright (c) 2024 Andres Montealegre, Email: montealegre.af@gmail.com
+# This project is licensed under the MIT License. See the [LICENSE] file for details.
+
 resource "oci_core_private_ip" "private_ip" {
   count = var.private_ip_count
   #Optional
